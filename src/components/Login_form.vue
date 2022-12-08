@@ -2,7 +2,6 @@
 import { useRouter, useRoute } from 'vue-router'
 import axios from "axios";
 import { ref, onMounted, toRaw} from 'vue';
-import Game_pre from './Game_pre.vue';
 
 const router = useRouter();
 
@@ -28,8 +27,6 @@ onMounted(async () => {
     {
       axios.post('http://mguiot.online/guardar.php',{grupo:grupo.value,password:password.value,tipo:'login'})
                  .then((res) => {
-
-    
                   const data = toRaw(res);
                   if(data.data[0].error == 0)
                   {
@@ -42,13 +39,11 @@ onMounted(async () => {
                       if(data.data[0].grupo[0].tipo == 1)
                       {
                       
-                        router.push({name:'game_pre', params: {
-             id: data.data[0].grupo[0].id_grupo,
-         }})
+                        router.push({path:'/game_pre', params:{"jugadores":data.data[0].jugadores}})
                       }
                       else
                       {
-                       localStorage.setItem("id_partida",data.data[0].grupo[0].id_partida)
+                       
                         router.push({path:'/game', params:{"jugadores":data.data[0].jugadores}})
                       }
                       
@@ -67,9 +62,9 @@ onMounted(async () => {
 
 </script>
 <template>
-    <div class="flex flex-col sm:flex-col md:flex-row w-full" :style="{'background-image':'url(/assets/roadmap_Loggin.jpg)'}">
-    <div id="login" class="flex flex-col w-full min-w-fit sm:w-2/4 md:w-1/4 bg-slate-200 rounded-lg h-screen content-center opacity-90">
-    <div id="banner" class="m-auto w-full sm:w-full md:w-4/5 bg-slate-300 mt-5 rounded-md p-2 shadow-md">
+    <div id="container">
+    <div id="login">
+    <div id="banner" class="bg-slate-300 rounded-md p-2 shadow-md">
       <h2>
       Digital & bussiness model transformation
       </h2>
@@ -77,7 +72,8 @@ onMounted(async () => {
       THE ROADMAP
       </h1>
     </div>
-    <div class="flex flex-col m-auto bg-slate-700 min-w-fit rounded-md mt-2 p-4 shadow-md w-4/5">
+    <br/>
+    <div class="flex flex-col my-10 bg-slate-700 rounded-md p-4 shadow-md">
       <span class="text-lg text-slate-100">Iniciar sesión</span>
       <span class="text-md text-slate-100 mt-4">Grupo</span>
       <select class="mt-3 h-8" v-model="grupo">
@@ -102,4 +98,59 @@ onMounted(async () => {
     </div>
 </template>
 <style scoped>
+@media (min-width: 1024px) {
+  #container {
+    display: flex;
+    place-items: center;
+  }
+
+  #login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+    margin-top: 5em;
+  }
+}
+@media (min-width: 1334px) {
+  #container {
+    display: flex;
+    place-items: center;
+  }
+
+  #login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+    margin-top: 5em;
+  }
+}
+@media (min-width: 640px) {
+  #container {
+    display: flex;
+    place-items: center;
+    padding: 1rem;
+  }
+
+  #login {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0 2rem;
+    margin-top: 5em;
+  }
+}
+@media (min-width: 320px) {
+  #container {
+    display: flex;
+    place-items: center;
+    padding: 1rem;
+  }
+
+  #login {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0 2rem;
+    margin-top: 5em;
+  }
+}
+
 </style>

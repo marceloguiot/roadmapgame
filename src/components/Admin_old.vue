@@ -74,13 +74,9 @@
   const partidas = ref([]);
   const equipos = ref([]);
   const jugadores = ref([]);
-  const subSprints = ref([]);
-
-  const static_grupos = ref([]);
 
   const partida_actual = ref("");
   const equipo_actual = ref("");
-  const partida_tipo_act = ref('');
 
   const puntaje1 = ref(0);
   const puntaje2 = ref(0);
@@ -103,9 +99,7 @@
 
   const inputJugador = ref('');
 
-  //CARTAS ASIGNADAS
 
-  const cartasAsignadas = ref([]);
 
   //TERMINA VARIABLES
 
@@ -113,41 +107,14 @@
   const loadPlayers = ref(false)
   const loadGroups = ref(false)
   const dealCards = ref(false)
-  const dealCardsManual = ref(false)
-  const editSprints = ref(false)
 
-const asignar = async () =>{
-  
-  if(partida_actual.value == '')
-  {
-    alert('Seleccione una partida para continuar.');
-  }
-  else if(equipo_actual.value == '')
-  {
-    alert('Seleccione un equipo para continuar.');
-  }
-  else
-  {
-    await axios.post('guardar.php',{tipo: 'asignacion', partida: partida_actual.value, equipo: equipo_actual.value, tsc1: tsc1.value, tsc2: tsc2.value, tsc3: tsc3.value, tsc4: tsc4.value, tsc5: tsc5.value, tsc6: tsc6.value, ms6: ms6.value, ms5: ms5.value, ms1: ms1.value, ms2: ms2.value, ms3: ms3.value, ms4: ms4.value})
-      .then(response => {
-        const data = toRaw(response);
-        cartasAsignadas.value = data.data;     
-      })
-
-
-  }
+const asignar = () =>{
   dealCards.value = false;
 }
 const logOut = () =>
 {
   router.push('/')
 }
-
-const editorCards = () =>
-{
-  router.push('/cards')
-}
-
 
 function setIsOpen(value) {
   isOpen.value = value
@@ -164,36 +131,27 @@ function closePlayers() {
 function openPlayers() {
   loadPlayers.value = true
 }
-const closeGroups = async () =>{
-
-    const nombres = document.getElementsByName('nt');
-    const claves = JSON.stringify(document.getElementsByName('passt'));
-    var nombresa = Array.prototype.slice.call(nombres);
-    console.log(nombresa);
-  
-  await axios.post('guardar.php',{tipo: 'equipos_static', nombre: 'nombres', claves: claves})
+async function closeGroups (){
+  if(partida_actual.value == '')
+  {
+    alert('Seleccione una partida para continuar.');
+    loadGroups.value = false
+  }
+  else
+  {
+    await axios.post('guardar.php',{tipo: 'equipos', partida: partida_actual.value, nombre1: nteam1.value, nombre2: nteam2.value, nombre3: nteam3.value, nombre4: nteam4.value, nombre5: nteam5.value, pass1: passt1.value, pass2: passt2.value, pass3: passt3.value, pass4: passt4.value, pass5: passt5.value})
       .then(response => {
         /*const data = toRaw(response);
         jugadores.value = data.data;
         */
-        loadGroups.value = false     
-      })
-
-    
-
-}
- 
-    
-  
-  
-
-const openGroups = async () => {
-  await axios.post('obtener.php',{tipo: 'equipos_static'})
-      .then(response => {
-        const data_team = toRaw(response);
-        static_grupos.value = data_team.data;
               
       })
+
+    loadGroups.value = false
+  }
+  
+}
+function openGroups() {
   loadGroups.value = true
 }
 
@@ -202,19 +160,10 @@ function openDeal()
 {
   dealCards.value = true;
 }
-function openDealManual()
-{
-  dealCardsManual.value = true;
-}
 
 function closeDeal()
 {
   dealCards.value = false;
-}
-
-function closeDealManual()
-{
-  dealCardsManual.value = false;
 }
 
 const eliminarPartida = async (id) =>
@@ -243,22 +192,21 @@ const obtenerEquipos = async (id) =>
   await axios.post('obtener.php',{tipo: 'grupos', id: id})
       .then(response => {
         const data = toRaw(response);
-        equipos.value = data.data[0].grupos;
+        equipos.value = data.data;
         console.log(data.data);
-        partida_tipo_act.value = data.data[0].partida_tipo;
         
-        if(typeof(data.data[0].grupos[0]) != 'undefined')
+        if(typeof(data.data[0]) != 'undefined')
         {
-          puntaje1.value = data.data[0].grupos[0].puntos;
+          puntaje1.value = data.data[0].puntos;
         }
         else
         {
           puntaje1.value = 0;
         }
 
-        if(typeof(data.data[0].grupos[1]) != 'undefined')
+        if(typeof(data.data[1]) != 'undefined')
         {
-          puntaje2.value = data.data[0].grupos[1].puntos;
+          puntaje2.value = data.data[1].puntos;
         }
         else
         {
@@ -266,9 +214,9 @@ const obtenerEquipos = async (id) =>
         }
       
 
-        if(typeof(data.data[0].grupos[2]) != 'undefined')
+        if(typeof(data.data[2]) != 'undefined')
         {
-          puntaje3.value = data.data[0].grupos[2].puntos;
+          puntaje3.value = data.data[2].puntos;
         }
         else
         {
@@ -276,9 +224,9 @@ const obtenerEquipos = async (id) =>
         }
       
 
-        if(typeof(data.data[0].grupos[3]) != 'undefined')
+        if(typeof(data.data[3]) != 'undefined')
         {
-          puntaje4.value = data.data[0].grupos[3].puntos;
+          puntaje4.value = data.data[3].puntos;
         }
         else
         {
@@ -286,9 +234,9 @@ const obtenerEquipos = async (id) =>
         }
       
 
-        if(typeof(data.data[0].grupos[4]) != 'undefined')
+        if(typeof(data.data[4]) != 'undefined')
         {
-          puntaje5.value = data.data[0].grupos[4].puntos;
+          puntaje5.value = data.data[4].puntos;
         }
         else
         {
@@ -302,20 +250,13 @@ const obtenerEquipos = async (id) =>
 }
 
 const asignarCartas = async () =>{
-  
-    if(partida_actual.value == '')
+  if(equipo_actual.value == '')
   {
-    alert('Seleccione una partida para continuar.');
+    alert('Seleccione un grupo para continuar.');
   }
   else
   {
-    if(partida_tipo_act.value == 1)
-  {
-   
-    router.push({name:'asignar', params:{"partida":partida_actual.value}});
-  }
-  else
-  {
+
     await axios.post('obtener.php',{tipo: 'cartas'})
       .then(response => {
         const data = toRaw(response);
@@ -328,15 +269,10 @@ const asignarCartas = async () =>{
               
       })
     openDeal();
-  }
-
-    
 
 
   }
 }
-
-
 
 
 const guardarJugador = async () =>
@@ -389,18 +325,10 @@ const obtenerJugadores = async (id) =>{
       .then(response => {
         const data = toRaw(response);
         jugadores.value = data.data;
-      });
+        console.log(data.data);
 
-
-  //obtengo cartas
-
-  await axios.post('obtener.php',{tipo: 'asignacion', id: id})
-      .then(response => {
-        const data = toRaw(response);
-        cartasAsignadas.value = data.data;
-      });
-
-  
+        
+      })
 }
 
 
@@ -487,42 +415,7 @@ const guardarPartida = async () =>{
                 
 }
 
-const mostrarSub = async () =>{
 
-  await axios.post('obtener.php',{tipo: 'subsprints'})
-      .then(response => {
-        const data = toRaw(response);
-        subSprints.value = data.data;
-      });
-  editSprints.value = true;
-}
-
-
-const closeSprints = ()=>
-{
-  editSprints.value = false;
-}
-
-const guardarSub = () =>
-{
-  editSprints.value = false;
-}
-
-
-const activar_equipo = (numero) =>
-{
-    if(enabled_team.value == true)
-    {
-    alert('Apagar');
-
-    
-
-    }
-    else
-    {
-      alert('Encender');
-    }
-}
 
 </script>
 <template>
@@ -543,15 +436,9 @@ const activar_equipo = (numero) =>
                 <span class="text-slate-100 text-md md:text-2xl sm:text-sm md:p-8 sm:p-2">Administrador de juego</span>
             </div>
             <div class="flex flex-row items-center md:justify-between w-1/5 sm:justify-between md:w-1/5 sm:w-2/6">
-              <span class="text-slate-100 p-1 md:text-lg hover:cursor-pointer hover:text-slate-200"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 00-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 00-2.282.819l-.922 1.597a1.875 1.875 0 00.432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 000 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 00-.432 2.385l.922 1.597a1.875 1.875 0 002.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 002.28-.819l.923-1.597a1.875 1.875 0 00-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 000-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 00-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 00-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 00-1.85-1.567h-1.843zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" clip-rule="evenodd" />
-</svg>
-</span>
+              <span class="text-slate-100 p-1 md:text-lg hover:cursor-pointer hover:text-slate-200">Config</span>
               <span class="text-slate-100 p-1 md:text-3xl">0:00:00</span>
-              <span @click="logOut" class="text-slate-100 p-1 md:text-lg hover:cursor-pointer hover:text-slate-200"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v9a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM6.166 5.106a.75.75 0 010 1.06 8.25 8.25 0 1011.668 0 .75.75 0 111.06-1.06c3.808 3.807 3.808 9.98 0 13.788-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788a.75.75 0 011.06 0z" clip-rule="evenodd" />
-</svg>
-</span>
+              <span @click="logOut" class="text-slate-100 p-1 md:text-lg hover:cursor-pointer hover:text-slate-200">Salir</span>
             </div>
           </div>
         </div>
@@ -559,32 +446,15 @@ const activar_equipo = (numero) =>
 
     <div class="flex flex-col items-center md:items-start md:flex-row w-full mt-5">
         <div class="flex flex-col w-3/4 lg:w-1/5 md:w-2/5 md:content-center sm:w-3/4 sm:content-center">
-            <span @click="openModal" class="flex flex-row text-center justify-around rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path d="M11.25 5.337c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.036 1.007-1.875 2.25-1.875S15 2.34 15 3.375c0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959 0 .332.278.598.61.578 1.91-.114 3.79-.342 5.632-.676a.75.75 0 01.878.645 49.17 49.17 0 01.376 5.452.657.657 0 01-.66.664c-.354 0-.675-.186-.958-.401a1.647 1.647 0 00-1.003-.349c-1.035 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401.31 0 .557.262.534.571a48.774 48.774 0 01-.595 4.845.75.75 0 01-.61.61c-1.82.317-3.673.533-5.555.642a.58.58 0 01-.611-.581c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.035-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959a.641.641 0 01-.658.643 49.118 49.118 0 01-4.708-.36.75.75 0 01-.645-.878c.293-1.614.504-3.257.629-4.924A.53.53 0 005.337 15c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.036 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.369 0 .713.128 1.003.349.283.215.604.401.959.401a.656.656 0 00.659-.663 47.703 47.703 0 00-.31-4.82.75.75 0 01.83-.832c1.343.155 2.703.254 4.077.294a.64.64 0 00.657-.642z" />
-</svg>
- Nueva partida</span>
-            <span @click="openPlayers" class="flex flex-row text-center justify-around rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path fill-rule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm0 3.75a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm0 3.75a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM10.875 18.75a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5zM3.375 15h7.5a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375zm0-3.75h7.5a.375.375 0 00.375-.375v-1.5A.375.375 0 0010.875 9h-7.5A.375.375 0 003 9.375v1.5c0 .207.168.375.375.375z" clip-rule="evenodd" />
-</svg>
- Cargar jugadores</span>
-            <span @click="openGroups" class="flex flex-row text-center justify-around rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-4.38z" clip-rule="evenodd" />
-  <path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.04c-.567.2-1.156.349-1.764.441z" />
-</svg>
- Grupos</span>
-            <span @click="asignarCartas" class="flex flex-row text-center justify-around rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
-</svg>
- Asignar cartas</span>
-            <span @click="editorCards" class="flex flex-row text-center justify-around rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
-  <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-18 3.75a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clip-rule="evenodd" />
-</svg>
- Editor de cartas</span>
+            <span @click="openModal" class="text-center rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100">Nueva partida</span>
+            <span @click="openPlayers" class="text-center rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100">Cargar jugadores</span>
+            <span @click="openGroups" class="text-center rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100">Grupos</span>
+            <span @click="asignarCartas" class="text-center rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100">Asignar cartas</span>
+            <span class="text-center rounded-md ml-1 mt-2 h-8 hover:bg-slate-500 hover:cursor-pointer bg-gray-600 p-1 text-slate-100">Editor de cartas</span>
         </div>
         <div class="lg:w-1/2 md:w-3/4 text-center bg-slate-100 mt-2 mx-2 p-2 rounded-md">
             <span class="text-center font-semibold mt-2 text-slate-600">Partidas</span>
-            <div v-for="item in partidas" class="flex flex-row items-center justify-around mt-3 bg-white hover:bg-cyan-500 hover:text-slate-100 hover:cursor-pointer p-1 rounded-sm">
+            <div v-for="item in partidas" class="grid grid-cols-5 items-center grid-flow-col gap-1 h-16 md:h-8 mt-3 bg-white hover:bg-slate-500 hover:text-slate-100 hover:cursor-pointer">
                 <div> 
                   <Switch
                     v-model="enabled"
@@ -599,9 +469,9 @@ const activar_equipo = (numero) =>
   </Switch>
             </div>
                 <span @click="obtenerEquipos(item.id)" class="text-xs">{{item.nombre}}</span>
-                <span @click="obtenerEquipos(item.id)" class="text-xs">Desde: {{item.fecha}} <br/>Hasta: {{item.fechat}}</span>
-                <span @click="obtenerEquipos(item.id)" class="text-xs">Max. Sprints: {{item.max_sprints}}</span>
-                <span @click="eliminarPartida(item.id)" class="text-lg font-semibold" >X</span>
+                <span @click="obtenerEquipos(item.id)" class="text-xs">{{item.fecha}} - {{item.fechat}}</span>
+                <span @click="obtenerEquipos(item.id)" class="text-xs">{{item.max_sprints}}</span>
+                <span @click="eliminarPartida(item.id)" class="text-xs" >X</span>
             </div>
         </div>
 
@@ -613,7 +483,6 @@ const activar_equipo = (numero) =>
     v-model="enabled_team"
     :class="enabled_team ? 'bg-emerald-600' : 'bg-gray-200'"
     class="relative inline-flex h-6 w-11 items-center rounded-full"
-    @click="activar_equipo(1)"
   >
     <span class="sr-only">Enable notifications</span>
     <span
@@ -699,7 +568,7 @@ const activar_equipo = (numero) =>
 
     </div>
     <div class="flex flex-col md:flex-row sm:flex-col mt-4 text-center gap-2">
-        <div class="md:w-1/5 sm:w-3/4 bg-lime-600 p-1.5 rounded-md max-h-40">
+        <div class="md:w-1/5 sm:w-3/4 bg-lime-600 p-1.5 rounded-md">
         <span class="text-slate-100 font-medium">Control de sprints</span>
         <div class="grid grid-rows p-1 mt-1 bg-slate-200">
                 <select class="m-1 rounded-sm border-2">
@@ -718,31 +587,20 @@ const activar_equipo = (numero) =>
                 
             </div>
         </div>
-        <div class="md:w-1/5 sm:w-3/4 bg-amber-600 p-1.5 rounded-md max-h-60">
+        <div class="md:w-1/5 sm:w-3/4 bg-amber-600 p-1.5 rounded-md">
             <span class="text-slate-100 font-medium text-center">Jugadores</span>
             <div class="flex flex-col  text-left justify-between gap-1 p-1 h-100 mt-1 bg-slate-200">
                 <div v-for="item in jugadores" class="flex flex-row justify-between"><span class="text-slate-700 ml-2">{{item.nombre}}</span><span class="mr-3 hover:cursor-pointer font-bold" @click="eliminarJugador(item.id)">X</span></div>
             </div>
-                <div class="mt-2 flex flex-row">
-                  <input type="text" v-model="inputJugador" id="jugadorNuevo" class="border-2 w-3/4" />
-                  <span @click="guardarJugador" class="text-white hover:cursor-pointer ml-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-  <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
-</svg>
-</span>
+                <div class="mt-2">
+                  <input type="text" v-model="inputJugador" id="jugadorNuevo" class="border-2 w-2/4" />
+                  <span @click="guardarJugador" class="bg-slate-200 text-sm p-1 rounded-sm ml-4 hover:cursor-pointer hover:bg-slate-400">Agregar</span>
                 </div>
         </div>
 
         <div class="md:w-3/4 sm:w-full h-100 text-center bg-slate-300 p-2 rounded-md">
           <span class="mt-2 text-slate-600 font-semibold">Cartas designadas</span>
-          <div class="bg-white p-4 max-h-60 mt-1 grid grid-cols-4 gap-4 overflow-y-scroll">
-            <template v-for="cards in cartasAsignadas">
-            <div v-if="cards.sprint == 1" class="bg-green-500 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            <div v-else-if="cards.sprint == 2" class="bg-yellow-400 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            <div v-else-if="cards.sprint == 3" class="bg-cyan-500 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            <div v-else-if="cards.sprint == 4" class="bg-cyan-700 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            <div v-else-if="cards.sprint == 5" class="bg-rose-500 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            <div v-else class="bg-orange-500 h-16 text-white rounded-md p-1">{{cards.titulo}}</div>
-            </template>
+          <div class="bg-white mt-1 h-80">
   
           </div>
         </div>
@@ -805,7 +663,7 @@ const activar_equipo = (numero) =>
                  <label>Canvas</label>
                 
                 </p>
-                <div class="grid grid-cols-2 grid-flow-col gap-1 p-1 h-100 mt-3 bg-white">
+                <div class="grid grid-cols-3 grid-flow-col gap-1 p-1 h-100 mt-3 bg-white">
                     <div class="grid grid-rows-2 grid-flow-row">
                     <span>Último sprint</span>
                     <select class="h-8" v-model="partida.sprints">
@@ -815,9 +673,7 @@ const activar_equipo = (numero) =>
                     <option value="4">Sprint 4</option>
                     <option value="5">Sprint 5</option>
                     <option value="6">Sprint 6</option>
-                    
                     </select>
-                   
                     </div>
                     <div class="grid grid-rows-2 grid-flow-row">
                       <span>Estado</span>
@@ -840,12 +696,10 @@ const activar_equipo = (numero) =>
 
                     </div>
                 </div>
-                
+
               </div>
-              <button
-                type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"  @click="mostrarSub">Agregar Subsprints</button>
-              <div class="mt-4 flex justify-end">
+
+              <div class="mt-4">
                 <button
                   type="button"
                   class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -969,7 +823,7 @@ const activar_equipo = (numero) =>
                 Configuración de grupos (General)
               </DialogTitle>
               <div class="mt-2 flex-direction-col content-center">
-                <table class="w-3/4 m-auto" >
+                <table class="w-3/4" >
                   <thead>
                     <tr>
                       <th>Grupo</th>
@@ -977,7 +831,11 @@ const activar_equipo = (numero) =>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="border-collapse border border-slate-400 w-3/4" v-for="team in static_grupos"><td><input type="text" class="w-1/2" name="nt[]" v-bind:value="team.nombre"/></td><td><input type="text" class="w-1/2" name="passt[]"  v-bind:value="team.password"/></td></tr>
+                    <tr class="border-collapse border border-slate-400 w-3/4"><td><input type="text" class="w-1/2" v-model="nteam1" name="nt1" value="Equipo 1"/></td><td><input type="text" class="w-1/2" name="passt1" v-model="passt1" value="Team1"/></td></tr>
+                    <tr class="border-collapse border border-slate-400 w-3/4"><td><input type="text" class="w-1/2" v-model="nteam2" name="nt2" value="Equipo 2"/></td><td><input type="text" class="w-1/2" name="passt2" v-model="passt2" value="Team2"/></td></tr>
+                    <tr class="border-collapse border border-slate-400 w-3/4"><td><input type="text" class="w-1/2" v-model="nteam3" name="nt3" value="Equipo 3"/></td><td><input type="text" class="w-1/2" name="passt3" v-model="passt3" value="Team3"/></td></tr>
+                    <tr class="border-collapse border border-slate-400 w-3/4"><td><input type="text" class="w-1/2" v-model="nteam4" name="nt4" value="Equipo 4"/></td><td><input type="text" class="w-1/2" name="passt4" v-model="passt4" value="Team4"/></td></tr>
+                    <tr class="border-collapse border border-slate-400 w-3/4"><td><input type="text" class="w-1/2" v-model="nteam5" name="nt5" value="Equipo 5"/></td><td><input type="text" class="w-1/2" name="passt5" v-model="passt5" value="Team5"/></td></tr>
                   </tbody>
 
                 </table>
@@ -985,7 +843,7 @@ const activar_equipo = (numero) =>
 
               </div>
 
-              <div class="mt-5">
+              <div class="mt-4">
                 <button
                   type="button"
                   class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -1040,10 +898,10 @@ const activar_equipo = (numero) =>
               >
                 Asignar cartas
               </DialogTitle>
-              <div class="mt-4">
+              <div class="mt-2">
                <table>
                 <tbody>
-                  <tr class="mt-2">
+                  <tr>
                   <td>Sprints:</td>
                   <td align="center" class="bg-green-500 text-white">-1-</td>
                   <td align="center" class="bg-yellow-400 text-white">-2-</td>
@@ -1053,36 +911,24 @@ const activar_equipo = (numero) =>
                   <td align="center" class="bg-orange-500 text-white">-6-</td>
                   </tr>
 
-                  <tr class="mt-2">
+                  <tr>
                     <td>Total de cartas:</td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc1"/></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc2"/></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc3"/></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc4"/></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc5"/></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc6"/></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc1" value="{{tsc1}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc2" value="{{tsc2}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc3" value="{{tsc3}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc4" value="{{tsc4}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc5" value="{{tsc5}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="tsc6" value="{{tsc6}}" /></td>
                   </tr>
-                  <tr class="mt-2">
+                  <tr>
                     <td>Movimientos:</td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms1" /></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms2" /></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms3" /></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms4" /></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms5" /></td>
-                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms6" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms1" value="{{ms1}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms2" value="{{ms2}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms3" value="{{ms3}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms4" value="{{ms4}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms5" value="{{ms5}}" /></td>
+                    <td><input type="number" class="w-12 text-center border-2 rounded-md border-gray-700" v-model="ms6" value="{{ms6}}" /></td>
                   </tr>
-                  <tr class="mt-2">
-                    <td></td>
-                    <td align="center">--</td>
-                    <td align="center">--</td>
-                    <td align="center">--</td>
-                    <td align="center">--</td>
-                    <td align="center">--</td>
-                    <td align="center">--</td>
-
-
-                  </tr>
-
                 </tbody>
                </table>
 
@@ -1105,191 +951,6 @@ const activar_equipo = (numero) =>
   </TransitionRoot>
 
   <!-- FIN MODAL ASIGNAR CARTAS -->
-
-
-    <!-- MODAL EDITAR SPRINTS-->
-    <TransitionRoot appear :show="editSprints" as="template">
-    <Dialog as="div" @close="closeSprints" class="relative z-10">
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black bg-opacity-25" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="flex min-h-full items-center justify-center p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
-            >
-              <DialogTitle
-                as="h3"
-                class="text-lg font-medium leading-6 text-gray-900"
-              >
-              SubSprints
-              </DialogTitle>
-              <div class="mt-4 w-full">
-               <table class="table-auto w-full border">
-                <tbody>
-                  <tr>
-                    <td align="center">Seleccionar</td>
-                    <td>Nombre</td>
-                    <td>Mecanica</td>
-                  </tr>
-                  <tr v-for="items in subSprints" class="mt-2 border p-1">
-                    <td align="center">
-                      <input type="checkbox" :id="items.id" value="{{items.id}}" />
-                    </td>
-                    <td>{{items.nombre}}</td>
-                    <td>
-                      
-                    <select defaultValue="{{items.mecanica}}">
-                      <option value="DataCard">DataCard</option>
-                      <option value="Canvas">Canvas</option>
-                      <option value="Journey">Journey</option>
-                      <option value="Navigator">Navigator</option>
-                    </select>
-                    </td>
-                  </tr>
-
-                </tbody>
-               </table>
-
-              </div>
-
-              <div class="mt-4">
-                <button
-                  type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  @click="guardarSub"
-                >
-                  Guardar
-                </button>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
-
-  <!-- FIN MODAL EDITAR SPRINTS -->
-
-
-    <!-- MODAL ASIGNAR CARTAS MANUAL-->
-    <TransitionRoot appear :show="dealCardsManual" as="template">
-    <Dialog as="div" @close="closeDealManual" class="relative z-10 w-4/5">
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black bg-opacity-25" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="flex min-h-full items-center justify-center p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
-            >
-              <DialogTitle
-                as="h3"
-                class="text-lg font-medium leading-6 text-gray-900"
-              >
-                Asignar cartas manualmente
-              </DialogTitle>
-              <div class="mt-4 w-full">
-               <table class="table-auto">
-                <tbody>
-                  <tr class="mt-2">
-                  <th>Equipos</th>
-                  <th>Sprint</th>
-                  <th align="center">Cartas</th>
-               
-                  </tr>
-                  <tr class="mt-2">
-                    <td>
-                      <select name="asigteam" id="asigteam">
-                        <option value=''>--SELECCIONE--</option>
-                        <option v-for="equipo in equipos" value='{{equipo.id}}'>Equipo {{equipo.id_grupo}}</option>
-
-                      </select>
-                    </td>
-                    <td class="ml-5">
-                      <select name='sprintcards' id='sprintcards'>
-                      <option value=''>--SELECCIONE--</option>
-                      <option value='1'>Sprint 1</option>
-                      <option value='2'>Sprint 2</option>
-                      <option value='3'>Sprint 3</option>
-                      <option value='4'>Sprint 4</option>
-                      <option value='5'>Sprint 5</option>
-                      <option value='6'>Sprint 6</option>
-                      </select>
-                    </td>
-                    <td class="bg-white w-96 p-4 max-h-60 mt-1 grid grid-cols-4 gap-4 overflow-y-scroll ml-5">
-                    </td>
-                  </tr>
-                 
-                 
-
-                </tbody>
-               </table>
-
-              </div>
-
-              <div class="mt-4">
-                <button
-                  type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  @click="asignarManual"
-                >
-                  Asignar
-                </button>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
-
-  <!-- FIN MODAL ASIGNAR CARTAS MANUAL-->
-
-
-
-
-
 </template>
 <style>
 </style>
